@@ -1,0 +1,32 @@
+# mystyle.mplstyle
+
+# Set the default font size to 12
+font.size: 14
+
+# Set the grid style
+axes.grid: True
+grid.linestyle: '--'
+grid.linewidth: 0.8
+grid.alpha: 0.75
+
+# Set the font size
+axes.labelsize: 14
+axes.titlesize: 16
+xtick.labelsize: 14
+ytick.labelsize: 14
+legend.fontsize: 14
+
+# legend settings
+legend.frameon: False
+legend.fancybox: True
+legend.facecolor: 'none'
+legend.edgecolor: 'none'
+
+# error bars
+errorbar.linewidth: 1
+errorbar.capsize: 4
+
+# bar plot
+bar.linewidth: 0.5
+bar.edgecolor: 'gray'
+
