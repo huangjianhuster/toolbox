@@ -5,7 +5,7 @@ font.size: 14
 
 # Set the grid style
 axes.grid: True
-grid.linestyle: '--'
+grid.linestyle: --
 grid.linewidth: 0.8
 grid.alpha: 0.75
 
@@ -23,10 +23,10 @@ legend.facecolor: 'none'
 legend.edgecolor: 'none'
 
 # error bars
-errorbar.linewidth: 1
+# errorbar.linewidth: 1
 errorbar.capsize: 4
 
 # bar plot
-bar.linewidth: 0.5
-bar.edgecolor: 'gray'
+patch.linewidth: 0.5
+patch.edgecolor: 'gray'
 
