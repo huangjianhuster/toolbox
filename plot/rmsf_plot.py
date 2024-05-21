@@ -1,13 +1,14 @@
 # Author: Jian Huang
 # Date: 2023/07/06
 
-# TODO:
-# plot rmsf
+# Usage: 
+# python rmsf_plot.py --pdb [PDB] --xvgfiles [1.xvg 2.xvg ...] --sep
 
 # Dependencies
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import os
 import argparse
 from Bio.PDB import PDBParser
 from Bio import PDB
@@ -42,16 +43,19 @@ def get_ss(pdb_file):
 
 def get_data(xvg_files_list, average=True):
     ys = []
+    labels = []
     for file in xvg_files_list:
         x, y = np.loadtxt(file,comments=["@","#"],unpack=True)
         # y *= 10
         ys.append(y)
+        label = os.path.basename(file).split('.')[0]
+        labels.append(label)
     if average:
         y_mean = np.mean(ys, axis=0)
         y_std = np.std(ys, axis=0)
         return x, y_mean, y_std
     else:
-        return x, ys
+        return x, ys, labels
 
 def main():
     # user defined variables
@@ -60,7 +64,6 @@ def main():
     parser.add_argument("--pdb", help="pdb file", required=True)
     parser.add_argument("--xvgfiles", help="gmx-xvg files for rmsf calculation", required=True, nargs="+")
     parser.add_argument("--sep", help="plot separate rmsf plots; otherwise plot average rmsf", action='store_true')
-    parser.add_argument("--labels", help="labels", default=None, nargs="+")
     args = parser.parse_args()
 
     # get secondary structures
@@ -84,13 +87,13 @@ def main():
     rmsf_xvg_files = args.xvgfiles
     if not args.sep:
         x, y_mean, y_std = get_data(rmsf_xvg_files, average=True) 
-        ax.errorbar(x, y_mean, yerr=y_std, elinewidth=1, linewidth=1.5, capsize=4)
+        ax.errorbar(x, y_mean, yerr=y_std, elinewidth=1, linewidth=1.5, capsize=2, label='Average')
         y_max = max(y_mean) + (max(y_mean) - min(y_mean))*0.2
     else: # plot separately
-        x, ys = get_data(rmsf_xvg_files, average=False)
+        x, ys, labels = get_data(rmsf_xvg_files, average=False)
         y_max = 0
-        for y in ys:
-            ax.plot(x, y, "-")
+        for y,label in zip(ys, labels):
+            ax.plot(x, y, "-", label=label)
             y_max_tmp = max(y) + (max(y) - min(y))*0.2
             if y_max < y_max_tmp:
                 y_max = y_max_tmp
@@ -100,7 +103,8 @@ def main():
     ax.set_ylim([0, y_max])
     ax.set_ylabel("RMSF")
     ax.set_xlabel("Res ID")
-    
+    ax.legend()
+
     # add secondary structure information
     first = 0
     ss_range = []
@@ -114,29 +118,28 @@ def main():
     
         else:
             # fill area
-            # x_a = [x[first], x[last]]
             # print(x[first], x[last])
             if ss[first] == 'H':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Helix")
             elif ss[first] == 'E':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Sheet")
             else:
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Coil")
             first = i+1
             
         if last == len(ss)-1:
             # print(x[first], x[last])
             if ss[first] == 'H':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Helix")
             elif ss[first] == 'E':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Sheet")
             else:
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.25)
+                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.5)
                 print(f"{int(x[first])}-{int(x[last])}: Coil")
     plt.show()
 

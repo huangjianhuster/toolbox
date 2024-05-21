@@ -1,0 +1,26 @@
+set nocompatible
+filetype plugin indent on
+" show existing tab with 4 spaces width
+set tabstop=4
+" when indenting with '>', use 4 spaces width
+set shiftwidth=4
+" On pressing tab, insert 4 spaces
+set expandtab 
+
+set number
+
+highlight DiffAdd    cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Yellow
+
+" vim and plumed syntax stuff:
+" :let &runtimepath.=','.$PLUMED_VIMPATH
+" :set completeopt=longest,menuone
+" :let plumed_shortcuts=1
+
+
+syntax on
+set backspace=indent,eol,start
+
+

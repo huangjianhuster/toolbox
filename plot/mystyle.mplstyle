@@ -24,7 +24,7 @@ legend.edgecolor: 'none'
 
 # error bars
 # errorbar.linewidth: 1
-errorbar.capsize: 4
+errorbar.capsize: 2
 
 # bar plot
 patch.linewidth: 0.5
