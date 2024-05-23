@@ -1,0 +1,57 @@
+environment configuration
+
+1. install mamba
+    # ref: https://github.com/conda-forge/miniforge
+    curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+    bash Miniforge3-$(uname)-$(uname -m).sh
+    # following instructions
+    # allow writing mamba into bashrc
+
+    # of note, mamba from miniforge will automatic have the channel "conda-forge" prioritized
+
+2. the "biosim" environment building process
+    mamba create -n biosim python=3.8
+    mamba activate biosim
+
+    # install basics
+    mamba install numpy
+    mamba install pandas
+    mamba install matplotlib 
+    mamba install -c conda-forge jupyterlab
+
+    # install biopython
+    mamba install -c conda-forge biopython
+    # DSSP for SS calculation is also necessary
+    mamba install -c salilab dssp
+
+    # install MDAnalysis
+    mamba install -c conda-forge mdanalysis
+
+    # install pyrosetta
+    # not for now...
+
+    # install mdtraj
+    mamba install -c conda-forge mdtraj
+
+    # vmd
+    mamba install -c conda-forge vmd
+    mamba install -c conda-forge vmd-python
+
+    # openmm
+    mamba install -c conda-forge openmm
+
+    # psfgen
+    # download from https://github.com/Eigenstate/psfgen
+    # python setup.py install
+
+    # gnuplot
+    mamba install conda-forge::gnuplot
+    echo 'set term x11' > ~/.bashrc
+
+   # other setup
+   # font in matplotlib
+    sudo apt install msttcorefonts -qq
+    rm ~/.cache/matplotlib -rf
+
+
+ 

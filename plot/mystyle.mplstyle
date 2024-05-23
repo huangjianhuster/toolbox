@@ -2,6 +2,7 @@
 
 # Set the default font size to 12
 font.size: 14
+font.family: Arial
 
 # Set the grid style
 axes.grid: True
