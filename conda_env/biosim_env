@@ -13,32 +13,17 @@ environment configuration
     mamba create -n biosim python=3.8
     mamba activate biosim
 
+    # unset
+    unset $LD_LIBRARY_PATH
+
     # install basics
-    mamba install numpy
-    mamba install pandas
-    mamba install matplotlib 
-    mamba install -c conda-forge jupyterlab
+    mamba install numpy pandas matplotlib jupyterlab biopython mdanalysis mdtraj openmm biopython
 
-    # install biopython
-    mamba install -c conda-forge biopython
-    # DSSP for SS calculation is also necessary
+    # install dssp in biopython
     mamba install -c salilab dssp
-
-    # install MDAnalysis
-    mamba install -c conda-forge mdanalysis
 
     # install pyrosetta
     # not for now...
-
-    # install mdtraj
-    mamba install -c conda-forge mdtraj
-
-    # vmd
-    mamba install -c conda-forge vmd
-    mamba install -c conda-forge vmd-python
-
-    # openmm
-    mamba install -c conda-forge openmm
 
     # psfgen
     # download from https://github.com/Eigenstate/psfgen
@@ -48,8 +33,10 @@ environment configuration
     mamba install conda-forge::gnuplot
     echo 'set term x11' > ~/.bashrc
 
-   # other setup
-   # font in matplotlib
+    # of note, do not install vmd using mamba...it will interfere ipython
+
+    # other setup
+    # font in matplotlib
     sudo apt install msttcorefonts -qq
     rm ~/.cache/matplotlib -rf
 
