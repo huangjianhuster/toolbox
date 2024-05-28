@@ -40,5 +40,8 @@ environment configuration
     sudo apt install msttcorefonts -qq
     rm ~/.cache/matplotlib -rf
 
+    # jupyter wedge and jupyter-lab wedge
+    pip install jupyter_contrib_nbextensions
+    conda install -c conda-forge python-lsp-server r-languageserver
 
  
