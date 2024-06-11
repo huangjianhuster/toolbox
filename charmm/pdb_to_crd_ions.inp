@@ -1,0 +1,31 @@
+
+! Read topology and parameter files
+prnlev 0
+stream toppar.str
+prnlev 5
+
+! Read in the pdb format input file into the COOR array
+open read card unit 10 name pot.pdb
+read sequence pdb unit 10
+open read card unit 10 name cla.pdb
+read sequence pdb unit 10
+generate IONS
+
+
+OPEN UNIT 20 NAME ions.pdb READ CARD
+READ COOR UNIT 20 PDB resid
+CLOSE UNIT 20
+
+! Fill and setup the internal coordinate tables
+
+IC FILL PRESERVE
+IC PARAMETERS
+IC PURGE
+IC BUILD
+
+! Write the COOR array out in crd format
+
+OPEN UNIT 20 NAME ions.crd WRITE CARD
+WRITE COOR UNIT 20 CARD
+CLOSE UNIT 20
+

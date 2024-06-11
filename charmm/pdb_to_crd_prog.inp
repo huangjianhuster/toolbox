@@ -1,0 +1,29 @@
+
+! Read topology and parameter files
+prnlev 0
+stream toppar.str
+prnlev 5
+
+! Read in the pdb format input file into the COOR array
+open read card unit 10 name prog.pdb
+read sequence pdb unit 10
+generate PROG first ace last ct2
+
+
+OPEN UNIT 20 NAME prog.pdb READ CARD
+READ COOR UNIT 20 PDB resid
+CLOSE UNIT 20
+
+! Fill and setup the internal coordinate tables
+
+IC FILL PRESERVE
+IC PARAMETERS
+IC PURGE
+IC BUILD
+
+! Write the COOR array out in crd format
+
+OPEN UNIT 20 NAME prog.crd WRITE CARD
+WRITE COOR UNIT 20 CARD
+CLOSE UNIT 20
+
