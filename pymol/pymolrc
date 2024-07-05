@@ -1,0 +1,23 @@
+bg_color gray80
+set antialias_shader, 2
+set surface_quality, 2
+set cartoon_sampling, 50
+set cartoon_discrete_colors, on
+
+set cartoon_oval_length, 1.0
+set cartoon_fancy_sheets, 1
+
+set max_ups, 0
+set use_shaders, 1
+set cartoon_use_shader, 1
+set cgo_use_shader, 1
+set dash_use_shader, 1
+set dot_use_shader, 1
+set line_use_shader, 1
+set mesh_use_shader, 1
+set nb_spheres_use_shader, 1
+set nonbonded_use_shader, 1
+set ribbon_use_shader, 1
+set sphere_use_shader, 1
+set stick_use_shader, 1
+set surface_use_shader, 1

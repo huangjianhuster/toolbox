@@ -1,0 +1,77 @@
+# This is the configuration recording of how I set up my mac from scrach
+
+0. using app store to stall essential softwares
+	MS 365: office outlook, ppt, word, one note, one drive
+	adobe pdf reader; illustrator
+	keepassium
+	VS code
+
+# I refered: https://github.com/sb2nov/mac-setup/blob/main/iTerm/zsh.md
+# for the following settings with some personal adjustment
+1. install homebrew package management tool
+# https://brew.sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. install mamba
+brew install --cask mambaforge
+
+3. install gnuplot
+brew install gnuplot
+
+4. configure zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+source ~/.zshrc
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+	
+	further settings: ZSH_THEME: afowler
+	# modify theme file to shorten the path in the prompt
+	PROMPT='%m %B%F{blue}:: %b%F{green}%1d $(hg_prompt_info)$(git_prompt_info)%B%(!.%F{red}.%F{blue})»%f%b '
+
+5. latex and configure it in VS code
+brew install --cask mactex
+	vscode extension:
+		Latex workshop
+		LTex
+		vi
+		python
+		jupyter
+        git
+
+6. configue mamba environment
+    mamba create -n biosim python=3.9
+    conda install conda-forge::pymol-open-source
+    mamba install -c conda-forge numpy pandas matplotlib biopython
+    pip install jupyterlab
+   
+7. zotero + zotero connector
+    # download from official website as dmg
+    # sign in my account
+
+8. visualization tools
+    install VMD
+
+9. my website dependencies
+    # https://jekyllrb.com/docs/installation/macos/
+    brew install chruby ruby-install xz
+        ==> Caveats
+        ==> chruby
+        Add the following to the ~/.bash_profile or ~/.zshrc file:
+          source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+        
+        To enable auto-switching of Rubies specified by .ruby-version files,
+        add the following to ~/.bash_profile or ~/.zshrc:
+          source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+    ruby-install ruby 3.1.3
+    gem install jekyll
+
+10. git and github
+    ssh-keygen -t ed25519 -C "huangjianhuster@gmail"
+    eval "$(ssh-agent -s)"
+    touch ~/.ssh/config
+    cat ~/.ssh/config
+        Host github.com
+        AddKeysToAgent yes
+        IdentityFile ~/.ssh/id_ed25519
+    ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+    
