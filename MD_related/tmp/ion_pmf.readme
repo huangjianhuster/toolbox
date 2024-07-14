@@ -1,0 +1,74 @@
+1. permeation event
+
+s1 (500 ns):
+    8 ns; pot resid = 1716
+    45 ns; resid = 1530
+    123 ns; resid = 1264
+    225 ns; resid = 1447
+    366 ns; resid = 1531
+    
+
+s2 (500 ns):
+    134 ns; resid = 1716
+    318 ns; resid = 1241
+    335 ns; resid = 1716
+    428 ns; resid = 1161
+    
+    
+
+s3 (500): 
+    35 ns; resid = 1716
+    50 ns; resid = 1500
+    55 ns; resid = 1076
+    215 ns; resid = 1171
+    226 ns; resid = 1204
+    330 ns; resid = 1095
+
+
+2. analysis:
+# ion, water density and ion PMF
+conda activate biosim
+
+python ../analysis_script/system_positions.py step6.6_equilibration.center.pdb
+    upper_memb_pos (A):  32.28754983840278
+    lower_memb_pos (A):  -4.6749164642404395
+    selectivity filter (A):  25.553378532541288
+    SF 358 (A):  21.767129371774686
+    SF 361 (A):  28.732127617013944
+    Y386 (A):  12.949630211008085
+
+python ion_water_pmf_bin1A.py step6.6_equilibration.center.pdb s1_alignTM.xtc analysis/s1 &> analysis/s1.log &
+python ion_water_pmf_bin1A.py step6.6_equilibration.center.pdb s2_alignTM.xtc analysis/s2 &> analysis/s2.log &
+python ion_water_pmf_bin1A.py step6.6_equilibration.center.pdb s3_alignTM.xtc analysis/s3 &> analysis/s3.log &
+
+python ion_water_plt.py analysis/s1__dG_ion_bin2A.dat analysis/s1__ion_density_b2A_cf4.dat analysis/s1__water_density_b2A_cf4.dat
+python ion_water_plt.py analysis/s1_dG_ion_bin1A.dat analysis/s1_ion_density_b1A_cf4.dat analysis/s1_water_density_b1A_cf4.dat    
+
+python ion_water_plt.py analysis/s2__dG_ion_bin2A.dat analysis/s2__ion_density_b2A_cf4.dat analysis/s2__water_density_b2A_cf4.dat
+python ion_water_plt.py analysis/s2_dG_ion_bin1A.dat analysis/s2_ion_density_b1A_cf4.dat analysis/s2_water_density_b1A_cf4.dat
+
+#average
+python ion_water_ave_plt.py
+
+
+3. permeation events plot
+
+    # only using the S1 trajectory
+    data:
+        ./analysis/s1_POT*_pos_rmPBC.dat
+        ./analysis/s1_upperMEM_pos.dat
+        ./analysis/s1_gate_pos.dat
+        ./analysis/s1_lowerMEM_pos.dat
+        ./analysis/s1_MEMcen_pos.dat
+
+    plot:
+        ./analysis/ion_permeation_location_zoomin.svg
+
+    replot:
+        python permeation_events_plt.py
+
+4. making video
+    # ./tmp
+    ffmpeg -framerate 10 -i test.%05d.ppm -c:v libx264 -vf "scale=800:-1:force_original_aspect_ratio=decrease,format=yuv420p" output.mp4
+    # ./tmp2
+    ffmpeg -framerate 8 -start_number 290 -i output.%05d.ppm -c:v libx264 -vf "scale=800:-1:force_original_aspect_ratio=decrease,format=yuv420p" output.mp4
