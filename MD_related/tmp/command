@@ -1,0 +1,12 @@
+singularity shell --nv ~/programs/chap/chap_singularity_version2.simg
+
+chap -s hsd2his.pdb -f s1_0mV_TMalign.xtc -out-filename s1
+
+chap -s hsd2his_sys.pdb -f s1_TMalign_sys_1ns.xtc -out-filename s1_sys -n open_align.ndx -pf-sel-ipp -pf-max-free-dist 1.5
+    # 1.5 unit: nm; the largest radius to expore...; default is 1 nm
+    <-- select lower gate as the staring search position "22"
+    <-- select "1" protein as the pore searching object
+    
+chap -s hsd2his_sys.pdb -f s2_TMalign_sys_1ns.xtc -out-filename s2_sys -n open_align.ndx -pf-sel-ipp -pf-max-free-dist 1.5
+chap -s hsd2his_sys.pdb -f s3_TMalign_sys_1ns.xtc -out-filename s3_sys -n open_align.ndx -pf-sel-ipp -pf-max-free-dist 1.5
+
