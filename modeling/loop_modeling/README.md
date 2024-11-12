@@ -22,7 +22,7 @@
     This will generate ```seq_alignment.ali``` and ```seq_alignment.pap``` files.
 
     A careful check of the ```seq_alignment.ali``` is required. I usually will use [T-coffee](https://tcoffee.crg.eu/) to quickly align the sequences as a third party reference. Modeller use "-" to represent mismatch of gaps. Make sure all the gap alignments are good, and manually edit the ```seq_alignment.ali``` if required.
-    The final seq_alignment.ali should have the something like the following:
+    The final seq_alignment.ali should have something like the following:
 
     ```
     >P1;code
@@ -48,6 +48,7 @@
     python align_build.py seq_alignment.ali code sequence_code
     ```
     Remember, ```code``` and ```sequence_code``` are from the ```seq_alignment.ali``` file mentioned above.
+    ```
 
 # Homology modeling
-    Homology modeling is similar to the above loop modeling code. Except in the ```align_build.py``` script, directly use ```automodel``` without any atom selection.
+Homology modeling is similar to the above loop modeling code. Except in the ```align_build.py``` script, directly use ```automodel``` without any atom selection.
