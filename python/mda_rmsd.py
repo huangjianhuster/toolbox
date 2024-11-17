@@ -23,4 +23,3 @@ R = rms.RMSD(u, ref,
                             ])                 # NMP
 R.run()
 
-

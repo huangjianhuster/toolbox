@@ -1,7 +1,6 @@
 # Author: Jian Huang
 # coding=utf-8
 # @Time :   12/23/22 7:59 AM
-# @File :   chloride_count.py
 # @Software :   PyCharm
 # @contact  :   jianhuang@umass.edu
 
@@ -28,6 +27,7 @@ target_trajectory = args.trajectory
 initial_frame = args.begin
 final_frame = args.end
 skip = args.skip
+
 
 # load system
 if target_trajectory:

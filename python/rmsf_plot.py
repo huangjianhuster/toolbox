@@ -1,6 +1,10 @@
 # Author: Jian Huang
 # Date: 2023/07/06
 
+# TODO:
+# plot RMSF data from PDB and rmsf calculation result;
+# The PDB is used for secondard structure annotation
+
 # Usage: 
 # python rmsf_plot.py --pdb [PDB] --xvgfiles [1.xvg 2.xvg ...] --sep
 
