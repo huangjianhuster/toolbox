@@ -1,12 +1,12 @@
 # A Toolbox
-    a toolbox for md trajectory analysis, plot and others.
+a toolbox for md trajectory analysis, plot and others.
 
 ## System settings
-    bash
+1.bash
     
 
 ## MD trajectory analysis
-    python
-    plot
+1. python
+2. plot
 
 ## Others
