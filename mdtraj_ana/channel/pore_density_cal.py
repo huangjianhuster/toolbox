@@ -115,7 +115,7 @@ def get_pmf(z_data, bin_num, bin_min, bin_max, frame_number, cutoff, saved_name=
             # probability: counts/total frames/area; shouldn't it be Volume?
     out = np.vstack((zaxis, DG)).T
     if saved_name:
-        np.savetxt(saved_name, out, header="Z-position(Ang)    PMF(kcal/mol)")
+        np.savetxt(saved_name, out, fmt='%.3f', header="Z-position(Ang)    PMF(kcal/mol)")
         return None
     else:
         return out
