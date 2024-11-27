@@ -14,36 +14,42 @@ import numpy as np
 import sys
 import os
 import argparse
-from Bio.PDB import PDBParser
-from Bio import PDB
-from Bio.PDB.DSSP import DSSP
 import warnings
+import subprocess
 warnings.filterwarnings("ignore")
 
 # plt.style.use('/home2/jianhuang/projects/packages/toolbox/plot/mystyle.mplstyle')
 
 # Functions
-class SelectChains(PDB.Select):
-    """ Only accept the specified chains when saving. """
-    def __init__(self, chain_letters):
-        self.chain_letters = chain_letters
+def run_stride(pdb_file):
+    """Run STRIDE and return the output."""
+    process = subprocess.run(["stride", pdb_file], capture_output=True, text=True)
+    return process.stdout
 
-    def accept_chain(self, chain):
-        return (chain.get_id() in self.chain_letters)
+def parse_stride_output(stride_output):
+    """Parse the STRIDE output to get secondary structure ranges."""
+    helices = []
+    sheets = []
+    loops = []
 
-def get_ss(pdb_file):
-    p = PDBParser()
-    pdb = "pdb_file"
-    structure = p.get_structure(' ', pdb_file)
-    model = structure[0]
-    dssp = DSSP(model, pdb_file)
-    resid = []
-    ss = []
-    for i,j in zip(list(dssp.keys()), list(model.get_residues())):
-        # resid.append(dssp[i][0])
-        ss.append(dssp[i][2])
-        resid.append(j.full_id[-1][1])
-    return resid, ss
+    for line in stride_output.splitlines():
+        # Skip non-data lines
+        if not line.startswith("LOC"):
+            continue
+
+        # Split STRIDE output line into columns
+        columns = line.split()
+        ss_type = columns[1]
+        chainid = columns[4]
+        ss_range = (int(columns[3]), int(columns[6]))
+
+        if ss_type in ['AlphaHelix', '310Helix']:
+            helices.append((chainid, ss_range))
+        elif ss_type in ['Strand', ]:
+            sheets.append((chainid, ss_range))
+        else:
+            loops.append((chainid, ss_range))
+    return helices, sheets, loops
 
 def get_data(xvg_files_list, average=True):
     ys = []
@@ -74,15 +80,8 @@ def main():
     pdb = args.pdb
     resid, ss = get_ss(pdb)
     # Simplify SS results
-    for i in range(len(ss)):
-        # print(ss[i])
-        if ss[i] == 'G' or ss[i] == 'I': # make pi helix and 310 helix to be "helix"
-            ss[i] = 'H'
-        elif ss[i] == '-' or ss[i] == 'T' or ss[i] == 'S' or ss[i]== 'B':   # make other types into "C" (coil)
-            # print(ss[i])
-            ss[i] = 'C'
-    print("\n-------Secondary Structure---------")
-    # print(ss)
+    stride_output = run_stride(pdb_file=pdb)
+    helix_ranges, sheet_ranges, loop_ranges = parse_stride_output(stride_output)
     
     # plot function
     fig, ax = plt.subplots(1,1,figsize=(10,6))
@@ -102,6 +101,12 @@ def main():
             if y_max < y_max_tmp:
                 y_max = y_max_tmp
     
+    # add secondary structure information
+    for chainid,(start,end) in helix_ranges:
+        ax.fill_betweenx([0,y_max], start, end, color='lightpink', alpha=0.4)
+    for chainid,(start,end) in sheet_ranges:
+        ax.fill_betweenx([0,y_max], start, end, color='lightgreen', alpha=0.4)
+    
     # ax.grid()
     ax.set_xlim(min(x), max(x))
     ax.set_ylim([0, y_max])
@@ -109,42 +114,6 @@ def main():
     ax.set_xlabel("Res ID")
     ax.legend()
 
-    # add secondary structure information
-    first = 0
-    ss_range = []
-    # print(ss)
-    for i in range(len(ss)-1):
-        # first = i
-        last = i
-        if ss[i] == ss[i+1]:
-            last = i+1
-            # print(last, len(ss))
-    
-        else:
-            # fill area
-            # print(x[first], x[last])
-            if ss[first] == 'H':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Helix")
-            elif ss[first] == 'E':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Sheet")
-            else:
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Coil")
-            first = i+1
-            
-        if last == len(ss)-1:
-            # print(x[first], x[last])
-            if ss[first] == 'H':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightpink', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Helix")
-            elif ss[first] == 'E':
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='lightgreen', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Sheet")
-            else:
-                ax.fill_betweenx([0,y_max], x[first], x[last], color='white', alpha=0.5)
-                print(f"{int(x[first])}-{int(x[last])}: Coil")
     plt.show()
 
 if __name__ == "__main__":
