@@ -1,6 +1,6 @@
 # mystyle.mplstyle
 
-# Set the default font size to 12
+# Set the default font size to 14
 font.size: 14
 font.family: Arial
 
@@ -17,17 +17,30 @@ xtick.labelsize: 14
 ytick.labelsize: 14
 legend.fontsize: 14
 
+# line style
+lines.linewidth: 1.5
+
+# define border style
+axes.linewidth: 2.0
+
 # legend settings
 legend.frameon: False
-legend.fancybox: True
+# legend.fancybox: True
 legend.facecolor: 'none'
 legend.edgecolor: 'none'
 
 # error bars
-# errorbar.linewidth: 1
 errorbar.capsize: 2
 
 # bar plot
-patch.linewidth: 0.5
+patch.linewidth: 1
 patch.edgecolor: 'gray'
 
+# other options
+figure.autolayout: True
+xtick.direction: in
+xtick.major.size: 8
+xtick.major.pad: 8
+ytick.direction: in
+ytick.major.size: 8
+ytick.major.pad: 8
