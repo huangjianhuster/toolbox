@@ -44,10 +44,16 @@
     Here, the ```code``` part was the sequence extracted from the PDB file which has two missing loops. the ```sequence_code``` part is what we want the final model to be, which is a completed structure without any missing residues.
 
 4. build the final models
+    We can use ```AutoModel``` from MODELLER (see: https://salilab.org/modeller/manual/node23.html) to build the loop region:
     ```python
     python align_build.py seq_alignment.ali code sequence_code
     ```
     Remember, ```code``` and ```sequence_code``` are from the ```seq_alignment.ali``` file mentioned above.
+
+    We can also use ```LoopModel``` from MODELLER (see: https://salilab.org/modeller/manual/node35.html)
+    ```python
+    python align_build2.py seq_alignment.ali code sequence_code
+
     ```
 
 # Homology modeling
