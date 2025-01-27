@@ -84,4 +84,5 @@ a.ending_model  = 1                # index of the last model
 
 a.loop.starting_model = 1           # First loop model
 a.loop.ending_model   = 3           # Last loop model
+a.loop.refine = 'fast'
 a.make()                           # do homology modeling

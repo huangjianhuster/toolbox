@@ -22,6 +22,8 @@
     This will generate ```seq_alignment.ali``` and ```seq_alignment.pap``` files.
 
     A careful check of the ```seq_alignment.ali``` is required. I usually will use [T-coffee](https://tcoffee.crg.eu/) to quickly align the sequences as a third party reference. Modeller use "-" to represent mismatch of gaps. Make sure all the gap alignments are good, and manually edit the ```seq_alignment.ali``` if required.
+    If there is one or more gaps you do not want to model, in the "sequence_code" part, you need to make certain gaps using "-".
+
     The final seq_alignment.ali should have something like the following:
 
     ```
