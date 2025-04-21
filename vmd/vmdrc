@@ -577,20 +577,28 @@ after idle {
       color change rgb black 0.000 0.000 0.000
       color change rgb yellow2 0.880 0.970 0.020
       color change rgb yellow3 0.550 0.900 0.020
-      color change rgb green2 0.000 0.900 0.040
-      color change rgb green3 0.000 0.900 0.500
+      # color change rgb green2 0.000 0.900 0.040
+      # color change rgb green3 0.000 0.900 0.500
+      color change rgb green2 0.600 1.00 0.800
+      color change rgb green3 0.20 0.80 0.60
       color change rgb cyan2 0.000 0.880 1.000
       color change rgb cyan3 0.000 0.760 1.000
-      color change rgb blue2 0.020 0.380 0.670
-      color change rgb blue3 0.010 0.040 0.930
+      # color change rgb blue2 0.020 0.380 0.670
+      # color change rgb blue3 0.010 0.040 0.930
+      color change rgb blue2 0.600 0.800 1.000
+      color change rgb blue3 0.200 0.500 0.800
       color change rgb violet 0.270 0.000 0.980
       color change rgb violet2 0.450 0.000 0.900
       color change rgb magenta 0.900 0.000 0.900
       color change rgb magenta2 1.000 0.4745 0.424
-      color change rgb red2 0.980 0.000 0.230
-      color change rgb red3 0.810 0.000 0.000
-      color change rgb orange2 0.890 0.350 0.000
-      color change rgb orange3 0.960 0.720 0.000
+      # color change rgb red2 0.980 0.000 0.230
+      # color change rgb red3 0.810 0.000 0.000
+      color change rgb red2 1.000 0.600 0.600
+      color change rgb red3 1.000 0.500 0.500
+      # color change rgb orange2 0.890 0.350 0.000
+      # color change rgb orange3 0.960 0.720 0.000
+      color change rgb orange2 1.00 0.80 0.60
+      color change rgb orange3 1.00 0.70 0.50
     }
     # state (scale) : active
     if { 1 } {

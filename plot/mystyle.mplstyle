@@ -18,7 +18,7 @@ ytick.labelsize: 14
 legend.fontsize: 14
 
 # line style
-lines.linewidth: 1.5
+lines.linewidth: 2.0
 
 # define border style
 axes.linewidth: 2.0
