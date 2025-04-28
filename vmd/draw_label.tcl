@@ -1,4 +1,4 @@
-# First, define a global list to store graphics IDs (to delete them later)
+# First, define a global list to store graphics IDs (to delete them later when tracing frames)
 set text_labels {}
 
 # Three letter to One letter mapping
@@ -28,12 +28,16 @@ set aa1letter {
     VAL V
 }
 
+# Selection definitions: better to keep the variable name as "reslabel"; in the selection, need to include "name CA"
+set reslabel [atomselect top "(same residue as (protein and within 4 of (resname POPI  and chain J and  name  C12 O2 C13 O3 C14 O4 P4 2OP4 3OP4 4OP4 C15 O5 P5 2OP5 3OP5 4OP5 C16 O6 C11 P O13 O14 O12 O11 ))) and resid 450 to 750 and name CA"]
+
 
 
 # Define a procedure to update the labels
 proc update_labels {} {
     global text_labels
     global aa1letter
+    global reslabel
 
     # Delete old labels
     foreach id $text_labels {
@@ -42,12 +46,17 @@ proc update_labels {} {
     set text_labels {}
 
     # Select contacting residues (adjust your ligand selection if needed)
-    set contacting [atomselect top "(same residue as (protein and within 4 of (resname POPI  and chain J and  name  C12 O2 C13 O3 C14 O4 P4 2OP4 3OP4 4OP4 C15 O5 P5 2OP5 3OP5 4OP5 C16 O6 C11 P O13 O14 O12 O11 ))) and resid 450 to 750 and name CA"]
-    $contacting update
+    $reslabel update
 
     # Get list of contacting residues
-    set reslist [$contacting get {resname resid x y z}]
+    set reslist [$reslabel get {resname resid x y z}]
     # puts $reslist
+
+    # Define groups
+    set negative {ASP GLU}
+    set positive {LYS ARG}
+    set polar {SER THR ASN GLN TYR CYS HIS HIE HSE}
+    set hydrophobic {ALA VAL LEU ILE MET PHE TRP PRO GLY}
     
     # Loop through all residues and labeling them
     foreach res $reslist {
@@ -58,6 +67,24 @@ proc update_labels {} {
         set x_shift [expr {$x + 1}]
         set y_shift [expr {$y + 1}]
         set z_shift [expr {$z + 1}]
+
+        # Determine color based on residue type
+        if {[lsearch $negative $resname] >= 0} {
+            set labelcolor red
+        } elseif {[lsearch $positive $resname] >= 0} {
+            set labelcolor blue
+        } elseif {[lsearch $polar $resname] >= 0} {
+            set labelcolor cyan
+        } elseif {[lsearch $hydrophobic $resname] >= 0} {
+            set labelcolor white
+        } else {
+            set labelcolor yellow  ;# fallback color for unknown residues
+        }
+
+        # override colors for labels if you want
+        # Set label color blue (ColorID 0 = blue by default)
+        # graphics top color 0
+        draw color $labelcolor
 
         # map to one letter
         set clean_resname [string trim $resname]
@@ -73,9 +100,6 @@ proc update_labels {} {
         # Three letter version
         # set label "${resname}${resid}"
 
-        # Set label color blue (ColorID 0 = blue by default)
-        graphics top color 0
-        
         # Draw the text
         set id [graphics top text "$x_shift $y_shift $z_shift" $label size 0.7 thickness 2.5]
         lappend text_labels $id
