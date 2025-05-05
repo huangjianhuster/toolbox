@@ -44,3 +44,5 @@ xtick.major.pad: 8
 ytick.direction: in
 ytick.major.size: 8
 ytick.major.pad: 8
+
+mathtext.default: regular
