@@ -5,6 +5,13 @@
 ```python
 python get_sequence_from_pdb.py [input_pdb_path]
 ```
+example: `python get_sequence_from_pdb.py 1ubq.pdb`.
+
+We get the following:
+
+```text
+{'A': 'MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG'}`
+```
 
 ## 2. fix sidechains and optimize side chain conformations
 
