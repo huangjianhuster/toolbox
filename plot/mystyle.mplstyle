@@ -1,6 +1,6 @@
 # mystyle.mplstyle
 
-# Set the default font size to 14
+# font
 font.size: 14
 font.family: Arial
 
@@ -13,9 +13,17 @@ grid.alpha: 0.75
 # Set the font size
 axes.labelsize: 14
 axes.titlesize: 16
+
+# other options
+# figure.autolayout: True
 xtick.labelsize: 14
 ytick.labelsize: 14
-legend.fontsize: 14
+xtick.direction: in
+xtick.major.size: 8
+xtick.major.pad: 8
+ytick.direction: in
+ytick.major.size: 8
+ytick.major.pad: 8
 
 # line style
 lines.linewidth: 2.0
@@ -28,21 +36,14 @@ legend.frameon: False
 # legend.fancybox: True
 legend.facecolor: 'none'
 legend.edgecolor: 'none'
+legend.fontsize: 14
 
 # error bars
 errorbar.capsize: 2
 
 # bar plot
 patch.linewidth: 1
-patch.edgecolor: 'gray'
+patch.edgecolor: 'white'
 
-# other options
-figure.autolayout: True
-xtick.direction: in
-xtick.major.size: 8
-xtick.major.pad: 8
-ytick.direction: in
-ytick.major.size: 8
-ytick.major.pad: 8
 
 mathtext.default: regular
