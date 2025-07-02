@@ -15,7 +15,7 @@ plt.style.use('mystyle.mplstyle')
 ```
 
 Some examples:
-![sin function](examples/test.png)
+![sin function](data/mystyle.png)
 
 ## 2. some good examples
 Most examples are from: https://github.com/rougier/scientific-visualization-book
@@ -31,4 +31,9 @@ Most examples are from: https://github.com/rougier/scientific-visualization-book
 7. `annotation-side.py`: a more advanced text annotation for data points.
 8. `annotation-zoom.py`: annotation of zoom-in sub-regions of a parent plot. 
 
+## 3. utils
+Some self-defined helper functions to add figure elements. 
 
+### 3.1 add labels to upper left corner of subplots
+see: `add_subplot_label` function defined in the `utils/add_label.py` module. The trick part is to "fix" the location of the label that is independent of figure size and aspect ratios of subplots.
+![add labels](data/add_labels.png)
