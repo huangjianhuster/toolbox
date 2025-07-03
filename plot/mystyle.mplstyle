@@ -44,6 +44,6 @@ errorbar.capsize: 2
 # bar plot
 patch.linewidth: 1
 patch.edgecolor: 'white'
-path.facecolor: 'skyblue'
+patch.facecolor: 'skyblue'
 
 mathtext.default: regular
