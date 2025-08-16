@@ -1,29 +1,32 @@
-# toolbox
-a toolbox for Computational Biophysics
+# Introduction
+a generic toolbox for computational biophysicist
 
-## Loop modeling
 
-dir: `loop_modeling`
+## Visualization
+`VMD`:
+- an example `vmdrc` for default settings
+- `morph.tcl`: morphing between two structures of a protein
+- `rotate_z.tcl`: rotate a protein (with coordinates change) in vmd
+- `draw_COM.tcl`: draw COMs of a atomgroup selection in vmd
+- `time.tcl`: draw time in vmd
 
-Goal: Fixing missing loops in a PDB file.
+`PyMol`:
+- `pymolrc`: my own pymolrc settings
 
-## VMD scripts
+## MD trajectory analysis
+`mdtraj_ana`:
+- `mda_argpase_tmp.py`: a template for argument control
+- `mda_threading_example.py`: a template for threading your analysis
+- `channel`: for ion channel analysis
+- `general`: for general proteins 
 
-dir: `vmd_scripts`
+## Modeling
+`loop_modeling`: model missing loops using 'Modeller'
+`alignment`: generate sequence alignment from fasta files or pdb files
+`process_PDB`: extract sequence from PDB files
 
-Goal: tcl scripts used in VMD visualization. 
 
-Usage: (open VMD)
-
-```text
-source xxx.tcl
-```
-
-- `vmdrc`: vmd initiation file. Replace your '~/.vmdrc' with this file.
-- `time.tcl`: add simulation time to the OpenGL window of VMD.
-- `morph.tcl`: morphing between two PDB structures.
-- `draw_interactions.tcl`: draw interacting residue pairs.
-- `default_rep.tcl`: quickly generate representations for your system.
-- `default_rep_memb.tcl`; quickly generate representations for membrane protein system.
-
-### 
+## Scientific plot
+`plot`:
+- a generic matplotlib style
+- plot 2d contour

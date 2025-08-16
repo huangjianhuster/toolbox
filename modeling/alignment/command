@@ -1,0 +1,2 @@
+python pdb_alignment.py -i 5WJ5_A.pdb 7SQ8_A.pdb
+python fasta_alignment.py Q99J21.fasta Q9GZU1.fasta

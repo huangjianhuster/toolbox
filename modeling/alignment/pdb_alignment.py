@@ -1,0 +1,461 @@
+#!/usr/bin/env python3
+"""
+PDB Protein Sequence Alignment and Residue Mapping using BioPython
+This script extracts sequences from PDB files, aligns them, and creates residue mapping dictionaries.
+"""
+
+import os
+import sys
+from Bio import PDB
+from Bio import Align
+from Bio import pairwise2
+import argparse
+import json
+
+def extract_sequence_from_pdb(pdb_file):
+    """
+    Extract protein sequence from PDB file (single chain)
+    Returns: (chain_id, sequence_string, residue_numbers, residue_info)
+    """
+    try:
+        parser = PDB.PDBParser(QUIET=True)
+        structure = parser.get_structure('protein', pdb_file)
+        
+        # Get the first model
+        model = structure[0]
+        
+        # Get all chains
+        chains = list(model.get_chains())
+        if len(chains) == 0:
+            raise ValueError(f"No chains found in {pdb_file}")
+        
+        if len(chains) > 1:
+            print(f"Warning: {pdb_file} contains {len(chains)} chains. Using the first one: {chains[0].id}")
+        
+        # Use the first chain
+        chain = chains[0]
+        chain_id = chain.id
+        
+        sequence = ""
+        residue_numbers = []
+        residue_info = {}  # {pdb_number: (residue_name, sequence_position)}
+        
+        # Standard amino acid three-letter to one-letter mapping
+        aa_dict = {
+            'ALA': 'A', 'CYS': 'C', 'ASP': 'D', 'GLU': 'E', 'PHE': 'F',
+            'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LYS': 'K', 'LEU': 'L',
+            'MET': 'M', 'ASN': 'N', 'PRO': 'P', 'GLN': 'Q', 'ARG': 'R',
+            'SER': 'S', 'THR': 'T', 'VAL': 'V', 'TRP': 'W', 'TYR': 'Y'
+        }
+        
+        seq_position = 0
+        for residue in chain:
+            # Only consider amino acids (not water, ions, etc.)
+            if residue.id[0] == ' ':  # Standard amino acid
+                res_name = residue.resname
+                res_number = residue.id[1]  # PDB residue number
+                
+                if res_name in aa_dict:
+                    one_letter = aa_dict[res_name]
+                    sequence += one_letter
+                    seq_position += 1
+                    residue_numbers.append(res_number)
+                    residue_info[res_number] = (one_letter, seq_position)
+                else:
+                    print(f"Warning: Unknown residue {res_name} at position {res_number} in {pdb_file}")
+        
+        if not sequence:
+            raise ValueError(f"No valid amino acid residues found in {pdb_file}")
+        
+        print(f"Successfully extracted sequence from {pdb_file}")
+        print(f"  Chain: {chain_id}")
+        print(f"  Length: {len(sequence)} residues")
+        print(f"  PDB numbering range: {min(residue_numbers)} to {max(residue_numbers)}")
+        
+        return chain_id, sequence, residue_numbers, residue_info
+        
+    except FileNotFoundError:
+        print(f"Error: File {pdb_file} not found")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error reading PDB file {pdb_file}: {e}")
+        sys.exit(1)
+
+def create_pdb_residue_mappings(aligned_seq_a, aligned_seq_b, residue_info_a, residue_info_b):
+    """
+    Create residue mapping dictionaries between two aligned sequences using PDB numbering.
+    
+    Returns:
+        dict: A_to_B mapping {pdb_num_A: (residue_A, pdb_num_B, residue_B)}
+        dict: B_to_A mapping {pdb_num_B: (residue_B, pdb_num_A, residue_A)}
+    """
+    A_to_B = {}  # {pdb_number_in_A: (residue_A, pdb_number_in_B, residue_B)}
+    B_to_A = {}  # {pdb_number_in_B: (residue_B, pdb_number_in_A, residue_A)}
+    
+    # Create reverse mapping from sequence position to PDB number
+    seq_to_pdb_a = {pos: pdb_num for pdb_num, (res, pos) in residue_info_a.items()}
+    seq_to_pdb_b = {pos: pdb_num for pdb_num, (res, pos) in residue_info_b.items()}
+    
+    # Track positions in original sequences (1-indexed)
+    pos_a = 0  # Current position in original sequence A
+    pos_b = 0  # Current position in original sequence B
+    
+    # Iterate through aligned sequences
+    for i in range(len(aligned_seq_a)):
+        res_a = aligned_seq_a[i]
+        res_b = aligned_seq_b[i]
+        
+        # Handle sequence A residue
+        if res_a != '-':
+            pos_a += 1
+            pdb_num_a = seq_to_pdb_a.get(pos_a)
+            
+            if pdb_num_a is not None:  # Valid PDB residue
+                # Map A to B
+                if res_b != '-':
+                    # Both have residues - direct mapping
+                    pdb_num_b = seq_to_pdb_b.get(pos_b + 1)
+                    if pdb_num_b is not None:
+                        A_to_B[pdb_num_a] = (res_a, pdb_num_b, res_b)
+                    else:
+                        A_to_B[pdb_num_a] = (res_a, '-', '-')
+                else:
+                    # A has residue, B has gap
+                    A_to_B[pdb_num_a] = (res_a, '-', '-')
+        
+        # Handle sequence B residue
+        if res_b != '-':
+            pos_b += 1
+            pdb_num_b = seq_to_pdb_b.get(pos_b)
+            
+            if pdb_num_b is not None:  # Valid PDB residue
+                # Map B to A
+                if res_a != '-':
+                    # Both have residues - direct mapping
+                    pdb_num_a = seq_to_pdb_a.get(pos_a)
+                    if pdb_num_a is not None:
+                        B_to_A[pdb_num_b] = (res_b, pdb_num_a, res_a)
+                    else:
+                        B_to_A[pdb_num_b] = (res_b, '-', '-')
+                else:
+                    # B has residue, A has gap
+                    B_to_A[pdb_num_b] = (res_b, '-', '-')
+    
+    return A_to_B, B_to_A
+
+def perform_alignment_new(seq1_id, seq1_seq, seq2_id, seq2_seq):
+    """
+    Perform sequence alignment using BioPython's new Align module
+    """
+    print(f"Using BioPython Align module for alignment...")
+    
+    # Create aligner object
+    aligner = Align.PairwiseAligner()
+    
+    # Set alignment parameters
+    aligner.match_score = 2
+    aligner.mismatch_score = -1
+    aligner.open_gap_score = -10
+    aligner.extend_gap_score = -0.5
+    aligner.mode = 'global'  # Global alignment
+    
+    # Perform alignment
+    alignments = aligner.align(seq1_seq, seq2_seq)
+    
+    # Get the best alignment
+    best_alignment = alignments[0]
+    aligned_seq_a = str(best_alignment[0])  # Full sequence A
+    aligned_seq_b = str(best_alignment[1])  # Full sequence B
+    score = best_alignment.score
+    
+    return aligned_seq_a, aligned_seq_b, score
+
+def perform_alignment_pairwise2(seq1_id, seq1_seq, seq2_id, seq2_seq):
+    """
+    Perform sequence alignment using BioPython pairwise2 (legacy method)
+    """
+    print(f"Using BioPython pairwise2 for alignment...")
+    
+    # Perform global pairwise alignment
+    # Using BLOSUM62 matrix with gap open penalty -10, gap extend penalty -0.5
+    alignments = pairwise2.align.globalds(seq1_seq, seq2_seq, 
+                                         pairwise2.blosum62, -10, -0.5)
+    
+    # Get the best alignment (first one)
+    best_alignment = alignments[0]
+    aligned_seq_a = best_alignment[0]
+    aligned_seq_b = best_alignment[1]
+    score = best_alignment[2]
+    
+    return aligned_seq_a, aligned_seq_b, score
+
+def perform_pdb_alignment(pdb1_file, pdb2_file, output_prefix='pdb_alignment', method='new'):
+    """
+    Perform sequence alignment from PDB files and create mapping dictionaries
+    """
+    # Extract sequences from PDB files
+    chain1_id, seq1, residue_nums1, residue_info1 = extract_sequence_from_pdb(pdb1_file)
+    chain2_id, seq2, residue_nums2, residue_info2 = extract_sequence_from_pdb(pdb2_file)
+    
+    seq1_id = f"{os.path.basename(pdb1_file)}_{chain1_id}"
+    seq2_id = f"{os.path.basename(pdb2_file)}_{chain2_id}"
+    
+    print(f"\nProtein A: {seq1_id} (length: {len(seq1)})")
+    print(f"Protein B: {seq2_id} (length: {len(seq2)})")
+    
+    try:
+        # Choose alignment method
+        if method == 'pairwise2':
+            aligned_seq_a, aligned_seq_b, score = perform_alignment_pairwise2(
+                seq1_id, seq1, seq2_id, seq2)
+        else:
+            aligned_seq_a, aligned_seq_b, score = perform_alignment_new(
+                seq1_id, seq1, seq2_id, seq2)
+        
+        print(f"\nAlignment completed successfully!")
+        print(f"Alignment score: {score:.2f}")
+        
+        # Write alignment results to files
+        output_alignment = f"{output_prefix}_alignment.txt"
+        output_fasta = f"{output_prefix}_aligned.fasta"
+        
+        # Write alignment in readable format (100-char chunks)
+        with open(output_alignment, 'w') as f:
+            f.write(f"Alignment between {seq1_id} and {seq2_id}\n")
+            f.write(f"Score: {score:.2f}\n\n")
+            
+            # Split alignment into 100-character chunks
+            chunk_size = 100
+            for start in range(0, len(aligned_seq_a), chunk_size):
+                end = min(start + chunk_size, len(aligned_seq_a))
+                
+                # Get sequence chunks
+                chunk_a = aligned_seq_a[start:end]
+                chunk_b = aligned_seq_b[start:end]
+                
+                # Create match line for this chunk
+                match_line = ""
+                for i in range(len(chunk_a)):
+                    if chunk_a[i] == chunk_b[i]:
+                        match_line += "|"
+                    elif chunk_a[i] == '-' or chunk_b[i] == '-':
+                        match_line += " "
+                    else:
+                        match_line += "."
+                
+                # Write this chunk
+                f.write(f"A: {chunk_a}\n")
+                f.write(f"   {match_line}\n")
+                f.write(f"B: {chunk_b}\n")
+                f.write(f"\n")  # Blank line between chunks
+        
+        # Write FASTA format
+        with open(output_fasta, 'w') as f:
+            f.write(f">{seq1_id}_aligned\n{aligned_seq_a}\n")
+            f.write(f">{seq2_id}_aligned\n{aligned_seq_b}\n")
+        
+        print(f"Output files generated:")
+        print(f"  - Alignment text: {output_alignment}")
+        print(f"  - Aligned FASTA: {output_fasta}")
+        
+        # Display partial alignment for verification
+        # print(f"\nAligned sequences (first 80 characters):")
+        # print(f"A: {aligned_seq_a[:80]}")
+        # print(f"B: {aligned_seq_b[:80]}")
+        # if len(aligned_seq_a) > 80:
+        #     print(f"   ... (total length: {len(aligned_seq_a)})")
+        
+        # Create residue mapping dictionaries using PDB numbering
+        A_to_B, B_to_A = create_pdb_residue_mappings(aligned_seq_a, aligned_seq_b, 
+                                                     residue_info1, residue_info2)
+        
+        # Save mapping dictionaries
+        mapping_file_a_to_b = f"{output_prefix}_A_to_B_mapping.json"
+        mapping_file_b_to_a = f"{output_prefix}_B_to_A_mapping.json"
+        
+        # Convert mappings to JSON-serializable format
+        A_to_B_json = {str(k): {'res_A': v[0], 'pos_B': v[1], 'res_B': v[2]} for k, v in A_to_B.items()}
+        B_to_A_json = {str(k): {'res_B': v[0], 'pos_A': v[1], 'res_A': v[2]} for k, v in B_to_A.items()}
+        
+        with open(mapping_file_a_to_b, 'w') as f:
+            json.dump(A_to_B_json, f, indent=2)
+        
+        with open(mapping_file_b_to_a, 'w') as f:
+            json.dump(B_to_A_json, f, indent=2)
+        
+        print(f"  - A to B mapping: {mapping_file_a_to_b}")
+        print(f"  - B to A mapping: {mapping_file_b_to_a}")
+        
+        # Print alignment statistics
+        identity = calculate_identity(aligned_seq_a, aligned_seq_b)
+        similarity = calculate_similarity(aligned_seq_a, aligned_seq_b)
+        gaps_a = aligned_seq_a.count('-')
+        gaps_b = aligned_seq_b.count('-')
+        
+        print(f"\nAlignment statistics:")
+        print(f"  - Alignment length: {len(aligned_seq_a)}")
+        print(f"  - Sequence identity: {identity:.2f}%")
+        print(f"  - Sequence similarity: {similarity:.2f}%")
+        print(f"  - Gaps in A: {gaps_a}")
+        print(f"  - Gaps in B: {gaps_b}")
+        
+        return A_to_B, B_to_A, seq1_id, seq2_id
+        
+    except Exception as e:
+        print(f"Error during alignment: {e}")
+        sys.exit(1)
+
+def calculate_identity(seq1_aligned, seq2_aligned):
+    """
+    Calculate sequence identity percentage from aligned sequences
+    """
+    matches = 0
+    total = 0
+    
+    for i in range(len(seq1_aligned)):
+        if seq1_aligned[i] != '-' and seq2_aligned[i] != '-':
+            total += 1
+            if seq1_aligned[i] == seq2_aligned[i]:
+                matches += 1
+    
+    if total > 0:
+        return (matches / total) * 100
+    else:
+        return 0.0
+
+def calculate_similarity(seq1_aligned, seq2_aligned):
+    """
+    Calculate sequence similarity percentage (including conservative substitutions)
+    """
+    # Simple similarity groups
+    similar_groups = [
+        set(['A', 'G']),  # Small
+        set(['I', 'L', 'V']),  # Hydrophobic
+        set(['F', 'W', 'Y']),  # Aromatic
+        set(['D', 'E']),  # Acidic
+        set(['K', 'R']),  # Basic
+        set(['S', 'T']),  # Polar
+        set(['N', 'Q']),  # Amide
+    ]
+    
+    matches = 0
+    total = 0
+    
+    for i in range(len(seq1_aligned)):
+        if seq1_aligned[i] != '-' and seq2_aligned[i] != '-':
+            total += 1
+            if seq1_aligned[i] == seq2_aligned[i]:
+                matches += 1
+            else:
+                # Check if they're in the same similarity group
+                for group in similar_groups:
+                    if seq1_aligned[i] in group and seq2_aligned[i] in group:
+                        matches += 1
+                        break
+    
+    if total > 0:
+        return (matches / total) * 100
+    else:
+        return 0.0
+
+def query_pdb_site_mapping(A_to_B, B_to_A, seq1_id, seq2_id, site_query):
+    """
+    Query specific site mapping using PDB numbering
+    site_query format: A32 or B15 (using PDB residue numbers)
+    """
+    print(f"\nSite mapping query: {site_query}")
+    
+    if site_query.upper().startswith('A'):
+        # Query protein A position
+        try:
+            pos = int(site_query[1:])
+            if pos in A_to_B:
+                res_a, pos_b, res_b = A_to_B[pos]
+                print(f"Protein A PDB position {pos} ({res_a}) maps to:")
+                if pos_b != '-':
+                    print(f"  Protein B PDB position {pos_b} ({res_b})")
+                else:
+                    print(f"  Gap in protein B (no corresponding residue)")
+            else:
+                available_positions = sorted(A_to_B.keys())
+                print(f"PDB position {pos} not found in protein A")
+                print(f"Available positions: {min(available_positions)}-{max(available_positions)}")
+        except ValueError:
+            print(f"Invalid position format: {site_query}")
+    
+    elif site_query.upper().startswith('B'):
+        # Query protein B position
+        try:
+            pos = int(site_query[1:])
+            if pos in B_to_A:
+                res_b, pos_a, res_a = B_to_A[pos]
+                print(f"Protein B PDB position {pos} ({res_b}) maps to:")
+                if pos_a != '-':
+                    print(f"  Protein A PDB position {pos_a} ({res_a})")
+                else:
+                    print(f"  Gap in protein A (no corresponding residue)")
+            else:
+                available_positions = sorted(B_to_A.keys())
+                print(f"PDB position {pos} not found in protein B")
+                print(f"Available positions: {min(available_positions)}-{max(available_positions)}")
+        except ValueError:
+            print(f"Invalid position format: {site_query}")
+    
+    else:
+        print(f"Invalid site query format: {site_query}")
+        print("Use format: A32 (for protein A PDB position 32) or B15 (for protein B PDB position 15)")
+
+def main():
+    parser = argparse.ArgumentParser(description='Align protein sequences from PDB files and create residue mappings')
+    parser.add_argument('-i', '--input', nargs=2, required=True, metavar=('PDB1', 'PDB2'),
+                       help='Two PDB files to align')
+    parser.add_argument('-s', '--site', 
+                       help='Query specific site mapping using PDB numbering (e.g., A32 for PDB position 32 in protein A)')
+    parser.add_argument('-o', '--output', default='pdb_alignment', 
+                       help='Output prefix for alignment and mapping files (default: pdb_alignment)')
+    parser.add_argument('--method', choices=['new', 'pairwise2'], default='new',
+                       help='Alignment method: "new" (Align module) or "pairwise2" (legacy)')
+    parser.add_argument('--verbose', action='store_true', 
+                       help='Enable verbose output')
+    
+    args = parser.parse_args()
+    
+    pdb1_file, pdb2_file = args.input
+    
+    # Check if input files exist
+    for pdb_file in [pdb1_file, pdb2_file]:
+        if not os.path.exists(pdb_file):
+            print(f"Error: File {pdb_file} not found")
+            sys.exit(1)
+    
+    print("Starting protein sequence alignment from PDB files with BioPython...")
+    print(f"Input files: {pdb1_file}, {pdb2_file}")
+    print(f"Output prefix: {args.output}")
+    print(f"Alignment method: {args.method}")
+    
+    # Perform alignment and get mappings
+    A_to_B, B_to_A, seq1_id, seq2_id = perform_pdb_alignment(pdb1_file, pdb2_file, args.output, args.method)
+    
+    # Query specific site if requested
+    if args.site:
+        query_pdb_site_mapping(A_to_B, B_to_A, seq1_id, seq2_id, args.site)
+    
+    # Print sample mappings
+    if not args.site:
+        print(f"\nSample mappings (first 10 PDB positions):")
+        print(f"A to B mapping:")
+        for i, (pdb_pos, mapping) in enumerate(sorted(A_to_B.items())):
+            if i >= 10:
+                break
+            res_a, pos_b, res_b = mapping
+            print(f"  A{pdb_pos}({res_a}) -> B{pos_b}({res_b})")
+        
+        print(f"B to A mapping:")
+        for i, (pdb_pos, mapping) in enumerate(sorted(B_to_A.items())):
+            if i >= 10:
+                break
+            res_b, pos_a, res_a = mapping
+            print(f"  B{pdb_pos}({res_b}) -> A{pos_a}({res_a})")
+
+if __name__ == "__main__":
+    main()
