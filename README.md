@@ -21,9 +21,9 @@ a generic toolbox for computational biophysicist
 - `general`: for general proteins 
 
 ## Modeling
-`loop_modeling`: model missing loops using 'Modeller'
-`alignment`: generate sequence alignment from fasta files or pdb files
-`process_PDB`: extract sequence from PDB files
+- `loop_modeling`: model missing loops using 'Modeller'
+- `alignment`: generate sequence alignment from fasta files or pdb files
+- `process_PDB`: extract sequence from PDB files
 
 
 ## Scientific plot
