@@ -23,7 +23,10 @@ a generic toolbox for computational biophysicist
 ## Modeling
 - `loop_modeling`: model missing loops using 'Modeller'
 - `alignment`: generate sequence alignment from fasta files or pdb files
-- `process_PDB`: extract sequence from PDB files
+- `process_PDB`: 
+    - extract sequence from PDB files: `get_seq_from_pdb.py`. Dependencies: Biopython
+    - extract frames from xtc: `extract_frames_from_xtc.py`. Dependencies: MDAnalysis
+    - model side chains (assuming all backbone atoms are present): `fix_opt_sidechains.py`. Dependencies: Modeller
 
 
 ## Scientific plot

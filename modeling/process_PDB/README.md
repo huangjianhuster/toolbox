@@ -14,7 +14,7 @@ We get the following:
 ```
 
 ## 2. fix sidechains and optimize side chain conformations
-
+Use `Modeller` to fix side chains, given that all backbone are present. The script will also optimize the side chain conformations in order to remove physcial clashes. 
 ```python
 python fix_opt_sidchains.py [input_pdb_path]
 ```
