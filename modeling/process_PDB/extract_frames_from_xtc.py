@@ -6,11 +6,9 @@ import string
 import subprocess
 
 def fix_chain_ids_with_convpdb(infile, outfile):
-    cmd = ["convpdb.pl", "-chainfromseg", infile]
-    cmd2 = ["sed", "-i", "s/HSD/HIS/g", outfile]
+    cmd = ["convpdb.pl", "-chainfromseg", "-out", "generic", infile]
     with open(outfile, "w") as fout:
         subprocess.run(cmd, stdout=fout, check=True)
-        subprocess.run(cmd2, stdout=fout, check=True)
 
 def reassign_chain_ids(atomgroup, outname):
     # Assign sequential chain IDs (A, B, C, ...)
@@ -27,11 +25,10 @@ def reassign_chain_ids(atomgroup, outname):
     atomgroup.write(outname)
     print(f"Saved with chain IDs reassigned → {outname}")
 
-
-def main(psf_file, xtc_file, output_prefix="random_frames",
+def main(psf_file, xtc_file, selection="backbone", output_prefix="random_frames",
          n_frames=3, seed=42, frames=None):
     u = mda.Universe(psf_file, xtc_file)
-    backbone = u.select_atoms("backbone")
+    selected = u.select_atoms(selection)
 
     total_frames = len(u.trajectory)
     if total_frames == 0:
@@ -49,7 +46,7 @@ def main(psf_file, xtc_file, output_prefix="random_frames",
         u.trajectory[frame_idx]  # move to the frame
         raw_name = f"{output_prefix}_{frame_idx}_raw.pdb"
         fixed_name = f"{output_prefix}_{frame_idx}.pdb"
-        reassign_chain_ids(backbone, raw_name)
+        reassign_chain_ids(selected, raw_name)
         fix_chain_ids_with_convpdb(raw_name, fixed_name)
 
 
@@ -62,6 +59,7 @@ if __name__ == "__main__":
     parser.add_argument("--nframes", type=int, default=3, help="Number of random frames")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--frames", nargs="+", help="User-defined frame indices (space-separated)")
+    parser.add_argument("--selection", default="backbone", help="mdanalysis selection syntax")
 
     args = parser.parse_args()
-    main(args.psf, args.xtc, args.prefix, args.nframes, args.seed, args.frames)
+    main(args.psf, args.xtc, args.selection, args.prefix, args.nframes, args.seed, args.frames)
