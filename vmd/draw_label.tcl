@@ -3,34 +3,13 @@ set text_labels {}
 
 # Three letter to One letter mapping
 set aa1letter {
-    ALA A
-    ARG R
-    ASN N
-    ASP D
-    CYS C
-    GLN Q
-    GLU E
-    GLY G
-    HIS H
-    HIE H
-    HSE H
-    HID H
-    ILE I
-    LEU L
-    LYS K
-    MET M
-    PHE F
-    PRO P
-    SER S
-    THR T
-    TRP W
-    TYR Y
-    VAL V
+    ALA A    ARG R    ASN N    ASP D    CYS C    GLN Q    GLU E    GLY G
+    HIS H    HIE H    HSE H    HID H    ILE I    LEU L    LYS K    MET M
+    PHE F    PRO P    SER S    THR T    TRP W    TYR Y    VAL V    HSD H
 }
 
 # Selection definitions: better to keep the variable name as "reslabel"; in the selection, need to include "name CA"
-set reslabel [atomselect top "(same residue as (protein and within 4 of (resname POPI  and chain J and  name  C12 O2 C13 O3 C14 O4 P4 2OP4 3OP4 4OP4 C15 O5 P5 2OP5 3OP5 4OP5 C16 O6 C11 P O13 O14 O12 O11 ))) and resid 450 to 750 and name CA"]
-
+set reslabel [atomselect top "resid 450 to 750 and name CA"]
 
 
 # Define a procedure to update the labels
@@ -69,21 +48,23 @@ proc update_labels {} {
         set z_shift [expr {$z + 1}]
 
         # Determine color based on residue type
-        if {[lsearch $negative $resname] >= 0} {
-            set labelcolor red
-        } elseif {[lsearch $positive $resname] >= 0} {
-            set labelcolor blue
-        } elseif {[lsearch $polar $resname] >= 0} {
-            set labelcolor cyan
-        } elseif {[lsearch $hydrophobic $resname] >= 0} {
-            set labelcolor white
-        } else {
-            set labelcolor yellow  ;# fallback color for unknown residues
-        }
+        # if {[lsearch $negative $resname] >= 0} {
+        #     set labelcolor red
+        # } elseif {[lsearch $positive $resname] >= 0} {
+        #     set labelcolor blue
+        # } elseif {[lsearch $polar $resname] >= 0} {
+        #     set labelcolor cyan
+        # } elseif {[lsearch $hydrophobic $resname] >= 0} {
+        #     set labelcolor white
+        # } else {
+        #     set labelcolor yellow  ;# fallback color for unknown residues
+        # }
 
         # override colors for labels if you want
         # Set label color blue (ColorID 0 = blue by default)
         # graphics top color 0
+        set labelcolor black
+
         draw color $labelcolor
 
         # map to one letter
@@ -104,9 +85,6 @@ proc update_labels {} {
         set id [graphics top text "$x_shift $y_shift $z_shift" $label size 0.7 thickness 2.5]
         lappend text_labels $id
     }
-
-    # Clean up selection
-    $contacting delete
 }
 
 proc label_trace {args} {
