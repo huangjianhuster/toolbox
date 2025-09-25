@@ -14,7 +14,7 @@ Frishman D, Argos P. [Knowledge-Based Protein Secondary Structure Assignment](h
 
 ## Use DSSP 
 
-DSSP is implemented in both the `mdtraj` and `MDAnalysis`.
+DSSP is implemented in both the `mdtraj` and `MDAnalysis`. For calculating a selected segment, you need to selected downstream `+5` and upstream `-5` residue indices of your interested region. For example, if you want secondary structures for `resid 10 to 20`, you need to select at least `resid 5 to 25`.
 
 1. DSSP in `MDAnalysis`: follow the [tutorial page](https://docs.mdanalysis.org/dev/documentation_pages/analysis/dssp.html)
 2. DSSP in `mdtraj`:
