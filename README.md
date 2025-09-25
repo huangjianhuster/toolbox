@@ -3,33 +3,35 @@ a generic toolbox for computational biophysicist
 
 
 ## Visualization
-`VMD`:
-- an example `vmdrc` for default settings
+`dir: VMD`:
+- an example `.vmdrc` for default settings
 - `morph.tcl`: morphing between two structures of a protein
 - `rotate_z.tcl`: rotate a protein (with coordinates change) in vmd
 - `draw_COM.tcl`: draw COMs of a atomgroup selection in vmd
 - `time.tcl`: draw time in vmd
+- `draw_label.tcl`: draw labels in vmd
+- `draw_interactions`: draw interactions in vmd
+- `secondary_structure_cache.tcl`: cache secondary structure calculation in vmd
 
 `PyMol`:
 - `pymolrc`: my own pymolrc settings
 
 ## MD trajectory analysis
-`mdtraj_ana`:
+`dir: TrajAnalysis`:
 - `mda_argpase_tmp.py`: a template for argument control
 - `mda_threading_example.py`: a template for threading your analysis
 - `channel`: for ion channel analysis
 - `general`: for general proteins 
+- `SecondaryStructureAnalysis`: calculating secondary structure over a trajectory
 
 ## Modeling
-- `loop_modeling`: model missing loops using 'Modeller'
-- `alignment`: generate sequence alignment from fasta files or pdb files
-- `process_PDB`: 
+- `dir: loop_modeling`: model missing loops using 'Modeller'
+- `dir: alignment`: generate sequence alignment from fasta files or pdb files
+- `dir: process_PDB`: 
     - extract sequence from PDB files: `get_seq_from_pdb.py`. Dependencies: Biopython
     - extract frames from xtc: `extract_frames_from_xtc.py`. Dependencies: MDAnalysis
     - model side chains (assuming all backbone atoms are present): `fix_opt_sidechains.py`. Dependencies: Modeller
 
 
 ## Scientific plot
-`plot`:
-- a generic matplotlib style
-- plot 2d contour
+`plot`: some of my own matplotlib practices and examples. Check the [plot practices](./plot/README.md)
