@@ -1,0 +1,14 @@
+# This is a configuration file
+name : John Doe  # User's full name (string)
+age    :    30   # Integer
+email:john@example.com  # Contact email
+
+# Status settings
+active : true
+score   :   95.5  # Float
+
+# List examples (separated by semicolons)
+coordinates : 10; 20; 30
+prices : 19.99; 29.99; 39.99
+colors : red; green; blue
+mixed : 100; 3.14; text; 42
