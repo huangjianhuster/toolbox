@@ -147,8 +147,8 @@ after idle {
     # <colors>
     # state (assign) : active
     if { 1 } {
-      color add item Display Background silver
-      color Display Background silver
+      color add item Display Background white
+      color Display Background white
       color add item Display BackgroundTop black
       color Display BackgroundTop black
       color add item Display BackgroundBot blue2
@@ -719,6 +719,36 @@ after idle {
 
 }
 
+
+####### customized style and functions
+
+### REPRESENTATIONS
+# control representation
+proc hide_rep {rep_index} {
+    mol showrep top $rep_index 0
+}
+
+proc show_rep {rep_index} {
+    mol showrep top $rep_index 1
+}
+
+proc toggle_rep {rep_index} {
+    set current [mol showrep top $rep_index]
+    mol showrep top $rep_index [expr {1 - $current}]
+}
+
+proc clean {} {
+    if {[molinfo num] == 0} {
+        puts "ERROR: No molecules loaded."
+        return
+    }
+    set num_reps [molinfo top get numreps]
+    for {set i 0} {$i < $num_reps} {incr i} {
+        mol delrep 0 top
+    }
+    puts "Deleted $num_reps representation(s) from top molecule."
+}
+
 proc channel {} {
     #### delete initial line representation for everything
     mol delrep 0 top
@@ -739,7 +769,7 @@ proc channel {} {
     #### make Cartoon representation for protein
     mol selection {protein}
     mol color Chain
-    mol representation NewCartoon
+    mol representation NewCartoon  0.280000 50.000000 3.500000 0
     mol material AOChalky
     mol addrep top
 
@@ -780,7 +810,11 @@ proc channel {} {
 
     ### pbc box
     pbc box -width 2.0
+    display resetview
+    rotate x by 270
 }
+
+
 
 proc rep {} {
     #### delete initial line representation for everything
@@ -792,13 +826,16 @@ proc rep {} {
     mol representation VDW
     mol material AOChalky
     mol addrep top
+    hide_rep 0
 
     #### make Cartoon representation for protein
     mol selection {protein}
     mol color Structure
-    mol representation NewCartoon
+    # float numbers are: thickness resolution aspect ratio spline_style
+    mol representation NewCartoon 0.280000 50.000000 3.500000 0
     mol material AOChalky
     mol addrep top
+    # hide_rep 1
 
     #### make line representation for water
     mol selection {water}
@@ -806,6 +843,7 @@ proc rep {} {
     mol representation Lines
     mol material AOChalky
     mol addrep top
+    hide_rep 2
     
     ### make line representation for lipids
     mol selection {lipids}
@@ -820,6 +858,7 @@ proc rep {} {
     mol representation Licorice
     mol material AOEdgy
     mol addrep top    
+    # hide_rep 4
 
     #### turn off axes
     axes location off
@@ -829,11 +868,66 @@ proc rep {} {
 
     ### pbc box
     pbc box -width 2.0
+    display resetview
+    rotate x by 270
 }
 
+proc set_allcartoon {{thickness 0.280000} {resolution 50.000000} {aspect_ratio 3.500000} {spline_style 0}} {
+    # Check if arguments are valid numbers
+    if {![string is double -strict $thickness] || ![string is double -strict $resolution] || \
+        ![string is double -strict $aspect_ratio] || ![string is integer -strict $spline_style]} {
+        puts "ERROR: Invalid arguments!"
+        puts "Usage: set_cartoon \[thickness\] \[resolution\] \[aspect_ratio\] \[spline_style\]"
+        puts "  thickness     : cartoon thickness (default: 0.280000)"
+        puts "  resolution    : cartoon resolution (default: 50.000000)"
+        puts "  aspect_ratio  : cartoon aspect ratio (default: 3.500000)"
+        puts "  spline_style  : 0=Catmull-Rom (default), 1=B-spline"
+        puts ""
+        puts "Examples:"
+        puts "  set_cartoon                        ;# Use all defaults"
+        puts "  set_cartoon 0.5                    ;# Change only thickness"
+        puts "  set_cartoon 0.5 100                ;# Change thickness and resolution"
+        puts "  set_cartoon 0.3 50 4.0 1           ;# Specify all parameters"
+        return
+    }
+    
+    # Validate spline_style range (0-16)
+    if {$spline_style != 0 && $spline_style != 1} {
+        puts "ERROR: spline_style must be between 0 and 16"
+        puts "Usage: set_cartoon \[thickness\] \[resolution\] \[aspect_ratio\] \[spline_style\]"
+        return
+    }
+    
+    # Get number of representations for top molecule
+    set num_reps [molinfo top get numreps]
+    set changed_count 0
+    
+    # Loop through all representations
+    for {set i 0} {$i < $num_reps} {incr i} {
+        # Get current representation style
+        set rep_style [molinfo top get "{rep $i}"]
+        puts $rep_style
+        
+        # If it's a NewCartoon representation, update it
+        if {[string match "*NewCartoon*" $rep_style]} {
+            mol modstyle $i top NewCartoon $thickness $resolution $aspect_ratio $spline_style
+            incr changed_count
+        }
+    }
+    
+    if {$changed_count > 0} {
+        puts "Updated $changed_count NewCartoon representation(s) with:"
+        puts "  thickness = $thickness, resolution = $resolution"
+        puts "  aspect_ratio = $aspect_ratio, spline_style = $spline_style"
+    } else {
+        puts "No NewCartoon representations found in top molecule."
+    }
+}
+
+
+### NEW DRAWINGS
 # define new colors
 # ref: https://sites.google.com/site/akohlmey/random-hacks/vmd-init-script
-
 # define arrow
 proc vmd_draw_arrow {mol start end {cradius 0.15}} {
     # an arrow is made of a cylinder and a cone
