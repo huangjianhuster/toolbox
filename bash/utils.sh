@@ -3,9 +3,21 @@
 # file i/o
 ensure_dir() {
   local dir="$1"
-  ​￼if [ ! -d "$dir" ]; then
+  if [ ! -d "$dir" ]; then
     mkdir -p "$dir"
   fi
+}
+
+# remove if already exist
+remove_path() {
+    local target="$1"
+
+    if [ -e "$target" ]; then
+        rm -rf "$target"
+        echo "Removed: $target"
+    else
+        echo "Path does not exist: $target"
+    fi
 }
 
 # usage: remove_suffix filepath
@@ -13,6 +25,23 @@ remove_suffix() {
     local filepath="$1"
     echo "${filepath%.*}"
 }
+
+
+# remove gromacs old files
+clean_hash_files() {
+    local dir="$1"
+
+    if [ ! -d "$dir" ]; then
+        echo "Not a directory: $dir"
+        return 1
+    fi
+
+    # Find and remove files starting with '#'
+    find "$dir" -maxdepth 1 -type f -name '#*' -exec rm -f {} \;
+
+    echo "Removed files starting with '#' in: $dir"
+}
+
 
 # usage: build_path parentdir subdir1 subdir2 ....
 build_path() {
@@ -121,5 +150,30 @@ run_parallel() {
     echo "========================================="
 }
 
-
-
+# ### EXAMPLE of parallel calculation
+# # rms functions
+# rms_cal() {
+#     local pdb="$1"
+#     local xtc="$2"
+#     local ndx="$3"
+#     local out="$4"
+#
+#     echo "17 17" | gmx_mpi rms -s ${pdb} -f ${xtc} -n ${ndx} -fit rot+trans -dt 1 -tu ns -o ${out}_TM.xvg
+#     echo "17 18" | gmx_mpi rms -s ${pdb} -f ${xtc} -n ${ndx} -fit rot+trans -dt 1 -tu ns -o ${out}_ARD.xvg
+#     echo "17 19" | gmx_mpi rms -s ${pdb} -f ${xtc} -n ${ndx} -fit rot+trans -dt 1 -tu ns -o ${out}_CTER.xvg
+# }
+#
+# ensure_dir "/home2/jianhuang/projects/thermosensation/trpv4/apo/rms/"
+# outpath="/home2/jianhuang/projects/thermosensation/trpv4/apo/rms/rmsd"
+# # input txt
+# cat > jobs.txt << EOF
+# ${eqpdb} ${xtc298Kr1} ${indexf} ${outpath}_298Kr1_
+# ${eqpdb} ${xtc298Kr2} ${indexf} ${outpath}_298Kr2_
+# ${eqpdb} ${xtc350Kr1} ${indexf} ${outpath}_350Kr1_
+# ${eqpdb} ${xtc350Kr2} ${indexf} ${outpath}_350Kr2_
+# ${eqpdb} ${xtc400Kr1} ${indexf} ${outpath}_400Kr1_
+# ${eqpdb} ${xtc400Kr2} ${indexf} ${outpath}_400Kr2_
+# EOF
+#
+# # calculation
+# run_parallel 6 rms_cal jobs.txt

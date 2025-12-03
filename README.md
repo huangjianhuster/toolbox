@@ -1,5 +1,5 @@
 # Introduction
-a generic toolbox for computational biophysicist
+a generic toolbox for computational biophysicists
 
 
 ## Visualization
@@ -12,6 +12,7 @@ a generic toolbox for computational biophysicist
 - `draw_label.tcl`: draw labels in vmd
 - `draw_interactions`: draw interactions in vmd
 - `secondary_structure_cache.tcl`: cache secondary structure calculation in vmd
+- `draw_principalaxes.tcl`: draw principal axes for a rigid body (domains)
 
 `PyMol`:
 - `pymolrc`: my own pymolrc settings
@@ -35,3 +36,6 @@ a generic toolbox for computational biophysicist
 
 ## Scientific plot
 `plot`: some of my own matplotlib practices and examples. Check the [plot practices](./plot/README.md)
+
+## Bash functions
+`bash/utils`: some useful bash functions for file I/O and parallelization.
