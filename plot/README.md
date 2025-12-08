@@ -38,3 +38,14 @@ Some self-defined helper functions to add figure elements.
 ### 3.1 add labels to upper left corner of subplots
 see: `add_subplot_label` function defined in the `utils/add_label.py` module. The trick is to "fix" the location of the label that is independent of figure size and aspect ratios of subplots.
 ![add labels](data/add_labels.png)
+
+
+# Suggested Gnuplot practices
+
+## 1. command line arguments
+Check: `gnuplot/plot.gp`
+
+```bash
+# example for usage
+gnuplot -c plot.gp file1.txt file2.txt
+```
