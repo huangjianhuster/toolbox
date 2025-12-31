@@ -39,3 +39,9 @@ a generic toolbox for computational biophysicists
 
 ## Bash functions
 `bash/utils`: some useful bash functions for file I/O and parallelization.
+
+## Python helper functions
+`python`:
+- `InputParser`: parse input arguments
+- `ArugmentParser`: parse command-line arguments
+- `Helpfuncs`: some useful functions (decorators; basic utils)

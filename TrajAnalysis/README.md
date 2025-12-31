@@ -24,3 +24,8 @@ dir: `SecondaryStructureAnalysis`
 
 1. DSSP in the `mdtraj` package: `mdtraj_dssp.py`
 2. STRIDE in VMD: `vmd_stride.tcl`. Check: [Using VMD STRIDE](./SecondaryStructureAnalysis/README.md)
+
+## solvent exposed surface area
+dir: `SASA`
+
+1. use `mdtraj` for SASA calculation
