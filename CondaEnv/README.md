@@ -1,6 +1,7 @@
-environment configuration
+conda/mamba environment configuration for computational biophysicists
 
 1. install mamba
+```bash
     # ref: https://github.com/conda-forge/miniforge
     curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
     bash Miniforge3-$(uname)-$(uname -m).sh
@@ -8,9 +9,11 @@ environment configuration
     # allow writing mamba into bashrc
 
     # of note, mamba from miniforge will automatic have the channel "conda-forge" prioritized
+```
 
 2. the "biosim" environment building process
-    mamba create -n biosim python=3.8
+```bash
+    mamba create -n biosim python=3.10
     mamba activate biosim
 
     # unset
@@ -26,8 +29,7 @@ environment configuration
     # not for now...
 
     # psfgen
-    # download from https://github.com/Eigenstate/psfgen
-    # python setup.py install
+    # mamba install -c conda-forge psfgen
 
     # gnuplot
     mamba install conda-forge::gnuplot
@@ -39,9 +41,5 @@ environment configuration
     # font in matplotlib
     sudo apt install msttcorefonts -qq
     rm ~/.cache/matplotlib -rf
-
-    # jupyter wedge and jupyter-lab wedge
-    pip install jupyter_contrib_nbextensions
-    conda install -c conda-forge python-lsp-server r-languageserver
-
+```
  
