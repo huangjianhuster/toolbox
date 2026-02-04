@@ -3,19 +3,9 @@ a generic toolbox for computational biophysicists
 
 
 ## Visualization
-`dir: VMD`:
-- an example `.vmdrc` for default settings
-- `morph.tcl`: morphing between two structures of a protein
-- `rotate_z.tcl`: rotate a protein (with coordinates change) in vmd
-- `draw_COM.tcl`: draw COMs of a atomgroup selection in vmd
-- `time.tcl`: draw time in vmd
-- `draw_label.tcl`: draw labels in vmd
-- `draw_interactions`: draw interactions in vmd
-- `secondary_structure_cache.tcl`: cache secondary structure calculation in vmd
-- `draw_principalaxes.tcl`: draw principal axes for a rigid body (domains)
+`vmd`: useful tcl scripts for vmd drawings and visualizations.
 
-`PyMol`:
-- `pymolrc`: my own pymolrc settings
+`PyMol`: PyMol settings for visualization
 
 ## MD trajectory analysis
 `dir: TrajAnalysis`:
