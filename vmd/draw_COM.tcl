@@ -1,23 +1,26 @@
 # Global variable to store the ID of the sphere
-set sphere_id ""
-set selection "chain A"
+set sphere_id [list]
+set sel "protein and chain A"
 
 # Set up a callback procedure to update the sphere position during animation
 proc update_sphere_position {} {
     global sphere_id
-    global selection
+    global sel
 
     # global vmd_frame
-    set selection [atomselect top $selection]
+    set selection [atomselect top $sel]
     set com [measure center $selection weight mass]
     
     # Delete the old sphere
-    if {$sphere_id ne ""} {
-        draw delete $sphere_id
+    foreach id $sphere_id {
+        graphics top delete $id
     }
 
+    set sphere_id [list]
+
     draw color green
-    set sphere_id [draw sphere $com radius 1.0 resolution 50]
+    set new_id [draw sphere $com radius 2.0 resolution 50]
+    lappend sphere_id $new_id
 
     # draw reference     
     # draw color blue
